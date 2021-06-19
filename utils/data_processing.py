@@ -1,5 +1,5 @@
 import networkx as nx
-from db import get_data
+from .db import get_data
 import matplotlib as mpl
 import matplotlib.pyplot as plt
 import math
