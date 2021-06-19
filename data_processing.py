@@ -1,6 +1,6 @@
 import networkx as nx
 import numpy as np
-from db import get_data
+from db import get_data, get_feature
 import matplotlib as mpl
 import matplotlib.pyplot as plt
 import math
@@ -15,7 +15,10 @@ def get_user_graph(
     start=start,
     end=end
   )
+  features = get_feature()
   G = nx.DiGraph()
+
+  # add edge by message
   for d in data:
     if G.has_edge(d[0], d[1]):
       G[d[0]][d[1]]['weight'] += len(d[2])
@@ -36,21 +39,28 @@ def get_user_graph(
       remove.append(u)
   G.remove_nodes_from(remove)
 
+  # add node feature
+  for node in G.nodes():
+    index = np.where(features[:,0] == node)
+    feature = np.squeeze(features[index], axis=0)
+    G.nodes[node]['gender'] = feature[1]
+    G.nodes[node]['feature'] = feature[2:]
   pickle.dump(G, open('./data/graph.pickle', 'wb'))
   return G
 
 if __name__ == '__main__':
-  G = get_user_graph(start='2019-11-01', end='2019-11-16')
+  G = get_user_graph(start='2021-5-15')
   print(nx.info(G))
   pos = nx.layout.spring_layout(G)
 
   node_sizes = [3 + 5 * G.degree[node] for node in G]
+  node_colors = ["blue" if G.nodes[n]['gender'] == 'male' else 'red' for n in G.nodes]
   M = G.number_of_edges()
   edge_colors = range(2, M + 2)
   w = [G[edge[0]][edge[1]]['weight'] for edge in G.edges]
   edge_alphas = [(math.tanh(x)+1)/2 for x in w]
 
-  nodes = nx.draw_networkx_nodes(G, pos, node_size=node_sizes, node_color="blue")
+  nodes = nx.draw_networkx_nodes(G, pos, node_size=node_sizes, node_color=node_colors)
   edges = nx.draw_networkx_edges(
     G,
     pos,
