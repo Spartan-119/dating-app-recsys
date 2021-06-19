@@ -1,5 +1,6 @@
 import networkx as nx
-from .db import get_data
+import numpy as np
+from db import get_data
 import matplotlib as mpl
 import matplotlib.pyplot as plt
 import math
@@ -20,6 +21,21 @@ def get_user_graph(
       G[d[0]][d[1]]['weight'] += len(d[2])
     else:
       G.add_edge(d[0], d[1], weight=len(d[2]))
+
+  # remove node interaction < 10
+  remove = []
+  for u in G.nodes():
+    weight_sum = np.array([G[u][v]['weight'] for v in G[u]]).sum()
+    if weight_sum < 10:
+      remove.append(u)
+  G.remove_nodes_from(remove)
+  remove = []
+  for u in G.nodes():
+    weight_sum = np.array([G[u][v]['weight'] for v in G[u]]).sum()
+    if weight_sum <= 0:
+      remove.append(u)
+  G.remove_nodes_from(remove)
+
   pickle.dump(G, open('./data/graph.pickle', 'wb'))
   return G
 

@@ -1,9 +1,9 @@
 import pickle
 import networkx as nx
 import numpy as np
-from utils.data_processing import get_user_graph
+from data_processing import get_user_graph
 from random import choice, sample
-from utils.evaluation import Recall
+from evaluation import Recall
 
 PRED_NUM=20
 
@@ -19,7 +19,7 @@ def get_global_list(G):
   idx = np.argsort(-avg_weight)
   nodes = np.array(G.nodes)
 
-  print([(node, weight) for node, weight in zip(nodes[idx], avg_weight[idx])])
+  # print([(node, weight) for node, weight in zip(nodes[idx], avg_weight[idx])])
   ranking_list = [node for node in nodes[idx]]
   return np.array(ranking_list[:PRED_NUM])
 
@@ -43,7 +43,8 @@ if __name__ == '__main__':
 
   pred = get_global_list(G)
 
-  random_users = sample(list(G.nodes()), 30)
+  sample_num = int(len(G.nodes()) / 10)
+  random_users = sample(list(G.nodes()), sample_num)
   ans = []
   for user in random_users:
     ans.append(get_user_list(G, user))
