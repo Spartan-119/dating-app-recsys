@@ -1,102 +1,28 @@
-# 基於社群網路分析的交友軟體推薦系統
-###### tags: `MLG`
-簡報網址：hackmd.io/@kuouu/MLG_final
-提案簡報：hackmd.io/@kuouu/MLG_final_proposal
+# Graph-based RecSys for Dating App
 
-近年來人們的交友管道越來越多元化，且隨著網路發展，開始出現了一些網路交友的平台，手機的普及更是促成交友軟體的誕生。但在使用交友軟體時常常會出現一些問題，像是配對的人不回訊息，或是開場很尷尬之類的情況，因此不同的開發團隊使用不同的方法來減少這方面的情形產生，像是使用一些興趣的標籤，讓陌生的彼此能夠快速用關鍵字認識對方，或是完善配對的推薦系統等等。
+A graph-based recommendation system develops for dating app.
 
-而我在這個研究當中，打算利用圖（Graph）來分析軟體的使用情況並且打造一個基於 Graph Neural Network 的推薦系統。將使用者轉換成點，將互動轉換成邊，所有使用者的互動情形最後會變成一張圖，圖像化這些資料之後，將會比以往資料庫中表格形式更能展現出現況，並且加以分析讓開發團隊能夠知道開發的方向與重點，讓團隊能夠更進步。
+Documentation in Chinese -> https://hackmd.io/@kuouu/mlg_final
 
----
+## Table of Contents
 
-## 介紹
+- [Introduction](#getting-started)
+- [Related Work](#usage)
+- [Contributing](#contributing)
+- [Contact](#contact)
 
-### AInimal 人工智慧社群養成
-![](https://i.imgur.com/6SWft3N.jpg)
+## Introduction
 
-網頁版 👉 ainimal.io
+  With the Internet growing rapidly, people’s life is more rely on online services. Especially for the date during covid-19, everyone not only works from home but also makes new friends from home. I’m a marketing group member in a start-up called AInimal, a student group that is developing a dating app, I found that the number of chats is more than before the level 3 covid-19 alert. Furthermore, other dating apps even start advertising on social media. In conclusion, dating app may be an important part of future life, so how to give the user the best experience is a question that matter.
 
-結合「寵物養成」以及「交友」兩個元素，透過與寵物的互動，利用 AI 分析性格，並且使用性格來做交友配對。其中性格一共分為五類，分別是：浪漫、狂野、睿智、活力、佛系。
+  However, one of the greatest problems is that users spent lots of time “swiping”, instead of building a strong and steady relationship with others. In other words, the recommender system is still not good enough. So, in this research, I want to propose an improved system for the dating app.
 
-#### 性格分析
+  Like social media, dating apps also hide a large network behind their system. I would like to use social network analysis to give visualize the picture of dating app users and apply graph neural network to build a recommender system. The former can give the marketing team a clearer reason to make decisions. The latter provides a more precise prediction that users may be interested in.
 
-![](https://i.imgur.com/Oa0Mwvk.png)
+## Related Work
 
-性格分析是使用了與寵物的對話進行自然語言處理，機制大概是如下：
-
-1. 將聊天訊息萃取成單字的陣列
-2. 將單字一個一個做 word embedding
-3. 比對五個性格當中哪個最接近，並將那個最接近的性格加分
-4. 最高分的性格即為使用者的性格
-
-但在使用一段時間後，會發現這個分析其實並不準確，我們自己的猜測是：
-
-- 聊天訊息並不足以代表一個人的性格，僅能代表他的聊天用字習慣而已
-- 性格分類沒有心理學依據
-
-因此現階段的性格分析並不能做為交友配對的依據，但自然語言處理並不是這篇研究的重點，因此會先暫時跳過這部分。
-
-#### 配對機制
-
-![](https://i.imgur.com/5yy1tik.png =200x)
-
-現行的配對機制非常簡單，只要符合以下兩點
-
-1. 符合篩選條件
-2. 當天有上線
-
-就會被加入抽卡池，並「隨機」抽取一位來配對，沒有喜歡跟不喜歡的階段，抽到就能直接開啟聊天室。
-
-#### 改良--基於個人特質的聊天活絡程度預測
-
-[Google Colab](https://colab.research.google.com/drive/1V33OHXKVuFGInMpeTwKCzmjxGJMZwjyt?usp=sharing)
-
-![](https://i.imgur.com/J21NA2j.png)
-
-![](https://i.imgur.com/IMH70C8.png)
-
-在前陣子就有想到說可以把深度學習套用在配對上，那時的想法也是利用人格特質來當作配對的依據，為了讓人格分析能夠更準確，我們使用了 LIWC(Linguistic Inquiry and Word Count) 這個軟體來對聊天訊息做處理，並且加入一些使用上的因素來做學習，正確率如下
-
-```
-train accuracy: 0.78
-test accuracy: 0.62
-```
-
-可以看到模型表現其實沒有很好，而且是有些 over fitting 的，開發團隊討論後列出幾個可能原因：
-
-- 模型太過簡單
-- 人格特質不適合作為聊天活絡程度的評斷標準
-
-我自己的觀點是：人格特質或許跟交友有關，但沒有辦法確定是“很像的人”還是“不像的人”容易成為朋友，甚至是情侶（這是大多數人用交友軟體的目的）
-
-比起個性或興趣，我認為成為朋友的契機更注重於一些當下的因素，心情、場域、機緣等，因此決定使用社群網路來做推薦系統，在取得當下使用者的整體使用情況做分析之後，再來做配對
-
-----
-
-### 配對成功定義
-
-其實做交友軟體的推薦系統一個比較難的點是定義配對成功，以 AI 的領域看就是資料的標記。在其他軟體上可能是右滑喜歡，我也有看過是配對一段時間之後會有彈出式視窗詢問配對滿意程度，但在 AInimal 裡面並沒有一個明確的評分標準，因此在開發過程必須自己定義。
-
-我自己會將配對分為幾個階段，排除掉完全沒有訊息的來回以及單純打招呼，大概分為三個階段
-
-#### 會回訊息
-
-![](https://i.imgur.com/gAQkE1e.png =400x)
-
-#### 聊得很熱絡
-
-![](https://i.imgur.com/HEfmSi4.png =400x)
-
-#### 真命天子/女、一生的好朋友
-
-![](https://i.imgur.com/SRDt2JG.png =400x)
-
-以軟體宗旨來說是希望能幫助使用者找到真命天子/女，但得知後續發展可能要做調查，在實際執行上可能有些困難，所以我會選擇退一步回到**找到很會聊的人**
-
----
-
-## 相關研究
-
+  Despite that the recommender system is a popular research topic in recent years, there are few focusing on dating apps. It can be the obstacle that finding an open dataset, or the relative research is owned by private usage. There are some papers or articles about recommender systems:
+  
 - [Recommender System for Online Dating Service](https://arxiv.org/pdf/cs/0703042.pdf) 2007 / 162 cites
 - [RECON: A reciprocal recommender for online dating](https://www.researchgate.net/publication/221140972_RECON_A_reciprocal_recommender_for_online_dating) 2010 / 184 cites
 - [Recommender Systems for Online Dating](https://core.ac.uk/download/pdf/33736431.pdf) 2015 / 6 cites
@@ -104,18 +30,52 @@ test accuracy: 0.62
 Dating](http://web.cs.ucla.edu/~yzsun/papers/snam2016.pdf) 2016 / 24 cites
 - [Shedding More Light on How Instagram Works](https://about.instagram.com/blog/announcements/shedding-more-light-on-how-instagram-works?fbclid=IwAR0L5kk9JEu3dEmz1VqIETTOevSWoc0IcZceaGTS9Vj_m0LccUGuJGsu_T0)
 
-儘管推薦系統也算是一項熱門的研究領域，但大多會著重在物品或是社交平台上的推薦，使用在交友軟體上的論文並沒有很多。以上幾個列出的相關研究大多是使用 CF（Collaborative Filtering）來做，使用深度學習的並不多。
+Shedding More Light on How Instagram Works
+  In these studies, CF (Collaborative Filtering) is the state-of-art technique in this field. The recommender system using deep learning is not usual.
 
----
+## Recommendation System
 
-## 演算法
-程式碼 👉 github.com/erickuo5124/MLG_final
+### Rule-Based Method
 
-在使用 Graph Neural Network 之前，我先嘗試單純用 rule base 的邏輯來做配對，並跟 GNN 的結果來做比對。除了多一個比對的標準之外，rule base 的效果其實也不一定比較差，計算的成本也不會很大，能夠大幅簡化配對的過程。
+Before jumping into the Graph Neural Network, I want to use some rule-based methods to match people and make the comparison with GNN method. Considering my experience in dating apps, recommending people who are "talkative" is much more critical than the "matched" one. In addition, it also helps me to achieve the goal-make the chat hot.
 
-因此這部分會分成兩段來介紹，前面會是我自己考慮使用者的需求想出的 rule base 演算法，第二部分則會使用使用者資料來畫成圖，並用 GNN 來做推薦。
+||talkative|non-talkative|
+|-|-|-|
+|talkative|Good match|Maybe|
+|non-talkative|Maybe|Difficult|
 
-### rule base
+In this situation, talkative people may always be recommended to the new user. But if we consider the time limit to reply to the message, they may lower the score if they reach the maximum, avoiding matching the same people to everyone.
+
+#### Average Chat Volume
+
+According to **Average Chat Volume** to recommend.
+
+$$
+Average Chat Volume = \frac{\sum_{Chats}Words}{Num _of _Chats}
+$$
+
+## Evaluation
+
+## Conclusion
+
+## Contributing
+
+Contributions are what make the open source community such an amazing place to learn, inspire, and create. Any contributions you make are **greatly appreciated**.
+
+1. Fork the Project
+2. Create your Feature Branch (`git checkout -b feature/AmazingFeature`)
+3. Commit your Changes (`git commit -m 'Add some AmazingFeature'`)
+4. Push to the Branch (`git push origin feature/AmazingFeature`)
+5. Open a Pull Request
+<br />
+
+## Contact
+
+About me: [Yu-Tsung (Eric) Kuo](https://www.linkedin.com/in/kuouu/) - erickuo5124@gmail.com
+
+Project Link: [https://github.com/kuouu/dating-app-recsys](https://github.com/kuouu/dating-app-recsys)
+
+
 
 在設計時，我預期了一些使用者可能遇到的問題，以及對於使用交友軟體的期望，得到的結論是：比起推薦所謂「匹配」的人，不如推薦「很會聊」的人給使用者，達到我們預期效果---聊天熱絡---的比例說不定會比較高。
 
