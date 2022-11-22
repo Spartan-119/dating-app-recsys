@@ -6,8 +6,11 @@ Documentation in Chinese -> https://hackmd.io/@kuouu/mlg_final
 
 ## Table of Contents
 
-- [Introduction](#getting-started)
-- [Related Work](#usage)
+- [Introduction](#Introduction)
+- [Related Work](#Related-Work)
+- [Recommendation System](#Recommendation-System)
+- [Evaluation](#Evaluation)
+- [Conclusion](#Conclusion)
 - [Contributing](#contributing)
 - [Contact](#contact)
 
