@@ -51,12 +51,98 @@ In this situation, talkative people may always be recommended to the new user. B
 According to **Average Chat Volume** to recommend.
 
 $$
-Average Chat Volume = \frac{\sum_{Chats}Words}{Num _of _Chats}
+Average Chat Volume = \frac{\sum_{Chats}Words}{NumOfChats}
 $$
+
+#### pseudo code
+
+1. get G
+2. get user_list
+3. remove random edge, get G’
+4. get rec_list by G’
+5. validation
+
+### Graph Neural Network
+
+![](https://i.imgur.com/InUM1lC.png)
+
+The purpose of using Graph Neural Network is nothing more than to obtain local or global information on the graph and to obtain additional information for matching in addition to the currently collected data. Therefore, my idea is to combine GNN with the large Collaborative Filtering of the current dating software recommendation system research to make recommendations.
+
+#### GNN
+
+Use GCN to get node embedding, and use similarity to do user Collaborative Filtering
+
+
+1. GCN learning node embedding
+2. Be the CF of user user
 
 ## Evaluation
 
+There are many ways to verify the recommendation system, but considering the situation of the actual data, there are many ways that are not suitable. The main problem is that "too little chat in a single chat room" data accounts for a large part of the whole, which makes the information seriously unbalanced. If these data are removed, the data will become too small to reflect the average situation.
+
+So here I use the recall rate (Recall) as an evaluation method, that is, the ratio of "prediction" to "actual," and it is also considered that it is better to debug when there is a problem (print out the lists on both sides).
+
+### recall
+
+$$
+Recall(pred, label) = \frac{OccurrencesOfPred}{LengthOfLabelList}
+$$
+
+### Network Diagram
+
+#### 2020
+
+![](https://i.imgur.com/RZDZmru.jpg)
+
+#### 2019
+
+![](https://i.imgur.com/GWaqJiI.jpg)
+
+The above data are from 11/01 to 11/15 in 2020 and 2019, respectively. You can see that besides the lump in the middle, there is a circle of single dots outside. That circle is the users who are not playing. You can zoom in to see I saw that the arrows were all pointing inwards; someone sent him a message, but he didn't reply. Maybe it was deleted immediately after downloading, or it was not chatting.
+
+When planning, I didn't expect that this situation would have such a severe impact, so I went to test directly, and the results are as follows:
+
+- rule base: < 0.1
+
+But after removing inactive users, the Recall of the rule base is increased to about 0.1 ~ 0.2. Although there is a significant improvement, it is still not high.
+
+Many points have "no outward edge"; many users are not using it, and they may download it to take a look and never log in again. Therefore, I will remove the inactive users after adding the user feature. And change the color according to gender, the graph becomes as follows.
+
+![](https://i.imgur.com/y3oCvyg.jpg)
+
+After matching according to gender, there is a significant improvement. I forgot that the majority of dating software is male-female matching!
+
+- The Recall of the rule base is increased to about 0.1 ~ 0.5
+- GNN is about 0.4 ~ 0.5 (more stable
+
+But it's not too high. It's not even better than using personality for deep learning before. Even if my current method of use is more logical, I believe the current direction is correct, but there may still be a lot of information. The place to deal with has not been considered. I will list the problem points I think of so far in the next.
+
+### Problems
+
+- A snapshot of the database at each point in time is required, ex: update time, today's login, friendship status
+- Insufficient data after removing inactive users (requires data over time
+- untagged material
+
 ## Conclusion
+
+This project applied GNN on dating apps, including:
+
+- Use graphs to visualize data and analyze user habits
+     - chat status
+     - pairing preference
+     - Average chat volume
+- Use user data in the time range for matching
+     - rule base
+     - Graph Neural Network
+
+### future work
+
+- Use network diagrams to present the current user status
+     - The pictures in this article use a spring layout, and there should be a better way to present them
+- Regularly back up the state of the database for training
+- Improve the software pairing mechanism to obtain tagged data
+     - Swipe right to like, swipe left to dislike
+     - Pair scoring mechanism
 
 ## Contributing
 
@@ -75,159 +161,4 @@ About me: [Yu-Tsung (Eric) Kuo](https://www.linkedin.com/in/kuouu/) - erickuo512
 
 Project Link: [https://github.com/kuouu/dating-app-recsys](https://github.com/kuouu/dating-app-recsys)
 
-
-
-在設計時，我預期了一些使用者可能遇到的問題，以及對於使用交友軟體的期望，得到的結論是：比起推薦所謂「匹配」的人，不如推薦「很會聊」的人給使用者，達到我們預期效果---聊天熱絡---的比例說不定會比較高。
-
-那問題就會變成怎麼定義「很會聊」，我自己的解釋會是在一定時間下的聊天量，與開啟的聊天室數量的比例，也就是「平均聊天量」。一個人如果面對不同的人、不同的情況下都能侃侃而談，那他應該就會是我們大力推薦給其他使用者的人；相對來說如果那個人只有對幾個人比較聊得開，那可能就是碰巧遇到而已，分母很大的情況下會拉低分數，更不用說很少在回訊息的人了。
-
-||會聊|不會聊|
-|-|-|-|
-|會聊|一定聊得來|有機會聊起來|
-|不會聊|有機會聊起來|有點困難|
-
-在這個情況下，「很會聊」的人會被一直配對到新的使用者，考量到一個人的時間有限，回訊息的量總有一個極限，到達極限之後再增加聊天室會讓分數降低，如此一來就能避免永遠只有一個人會被配對到的情況。
-
-#### 平均聊天量
-
-依據當下的**平均聊天量**由高至低做推薦
-
-$$
-平均聊天量 = \frac{\sum_{聊天室}聊天字數}{聊天室數量}
-$$
-
-
-#### 期望結果
-
-- 會聊天的人優先，會“被”配對到很多人
-- 不會聊天的人比較不會被主動配對到
-- 在時間內配對到一定程度會讓聊天量下降，後面順位的人往上排名
-
-#### 解決的問題
-
-- 配對到的人最近一定有在玩，而且很活躍
-- 雙方至少有一人有一定的社交程度，造成尷尬開場的機率較低（難聊的人不會互相遇到）
-- 聊天室數量增加會降低平均聊天量，因此過度配對會降低排名，不會有某個人一直配對到超多人的情況
-- 與比較會聊的人配對，增加社交能力較低的人的自信
-
-#### pseudo code
-
-1. get G
-2. get user_list
-3. remove random edge, get G’
-4. get rec_list by G’
-5. validation
-
-### Graph Neural Network
-
-![](https://i.imgur.com/InUM1lC.png)
-
-使用 Graph Neural Network 的目的不外乎就是獲得圖上 local 或是 global 的資訊，能在目前搜集的資料之外獲得更多額外的資訊來做配對。因此我的想法是結合 GNN 跟目前交友軟體推薦系統研究的大宗 Collaborative Filtering 來做推薦。
-
-#### GNN
-
-用 GCN 得到 node embedding ，並使用 similarity 做 user user 的 Collaborative Filtering
-
-
-1. GCN 學習 node embedding
-2. 做 user user 的 CF
-
----
-
-## 實作
-
-### Evaluation
-
-對於推薦系統的驗證方式其實有很多種，但考量到真實資料的狀況，其實有很多方式是不太合適的。最主要的問題是「單一聊天室聊天量太少」的資料佔整體的很大一部分，這使資料嚴重的不平衡，若是移除這些資料又會讓資料變得太少，不足以反映平均的狀況。
-
-因此在這裡我是使用召回率（Recall）來做評價的方式，也就是「預測」出現在「實際」上的比例，其中也考慮到有問題時比較好 Debug（將兩邊的 list 印出）。
-
-#### recall
-
-$$
-Recall(pred, label) = \frac{pred 出現在 label\_list 出現次數}{label\_list 的長度}
-$$
-
-### Data set
-
-| 資料名稱 | 數量 | 
-| -------- | -------- | 
-| user | 5043 |
-| chat | 290559 |
-| friend | 22683 |
-
-上面是目前資料庫中整體的資料狀況，但在訓練的過程中，會將資料以「一段時間」來做取用，因為這篇研究強調「當下狀況」，而不是整體的表現。實際是使用一個月來訓練，以抓取 2020 年 11 月來說，大約可以獲得 300 個左右的使用者，訊息總量大約是 20000 上下，但實際上經過篩選後的資料又更少了。
-
-在取得使用者的 node feature 部分我是使用以下幾種資料：
-
-- gid
-- gender
-- animal
-- heart
-- type
-- personality
-- bgm
-- active_time
-
-當然資料庫裡面並不只有這些，還有一些上線時間等等的資料，但考量到是以時間間隔來做訓練，再抓資料的時候如果不是抓最新資料，有些資料就沒有辦法使用，例如：最後上線時間。
-
-如果有要發展下去之後可能要定期備份資料庫 snapshot。
-
-#### 網路圖
-
-##### 2020
-
-![](https://i.imgur.com/RZDZmru.jpg =450x) 
-
-##### 2019
-
-![](https://i.imgur.com/GWaqJiI.jpg =450x)
-
-上面分別為 2020, 2019 年 11/01～11/15 的資料，可以看到除了中間那一坨之外，外面還有一圈單個的點，那圈就是比較沒有在玩的使用者，放大看可以看到箭頭都是往內，也就是別人傳訊息給他，但他都沒有回，可能是下載之後馬上就刪掉了，又或者單純是沒有在聊天。
-
-事前規劃的時候沒有想到這個情況會影響這麼嚴重，直接就下去測試，結果如下：
-
-- rule base: < 0.1
-
-但在移除不活躍的使用者之後，rule base 的 Recall 提升至約 0.1 ~ 0.2 雖然是有很明顯的提升，但還是不高。
-
-其實很多點“沒有往外的邊”，也就是很多使用者沒有在使用，可能只是下載來看一看就再也沒有登入了，因此在加入 user feature 之後，我將不活躍的使用者移除，並按照性別改變顏色，圖形變成如下
-
-![](https://i.imgur.com/y3oCvyg.jpg =600x)
-
-按照性別配對之後就有顯著的提升了，我居然都忘記交友軟體的大宗還是男女配對啊！
-
-- rule base 的 Recall 提升至約 0.1 ~ 0.5
-- GNN 約為 0.4 ~ 0.5（較穩定
-
-但其實也不算是太高，相比之前使用性格做深度學習的甚至沒有比較好，就算我現在的使用方法是比較有邏輯性的，我相信現在的方向是正確的，只是可能還有很多資料處理的地方沒有考慮到，我把目前想到的問題點列在下一點。
-
-### 問題點
-
-- 需要每個時間點資料庫的 snapshot，ex: 更新時間、今日登入、交友狀況
-- 移除不活躍的使用者之後資料不足（需要一段時間內的資料
-- 沒有標記的資料
-
----
-
-## 結論
-
-本篇研究圖（Graph）在交友軟體上的應用，包括：
-
-- 利用圖形來視覺化呈現資料並分析使用者習性
-    - 聊天狀況
-    - 配對偏好
-    - 平均聊天量
-- 使用時間區段內的使用者資料來做配對
-    - rule base
-    - Graph Neural Network
-
-### future work
-
-- 利用網路圖來呈現目前使用者的狀況
-    - 本篇當中的圖是使用 spring layout，應該有更好的呈現方式
-- 定期備份資料庫狀態以拿來做訓練
-- 改善軟體配對機制，取得標記資料
-    - 右滑喜歡、左滑不喜歡
-    - 配對評分機制
 
