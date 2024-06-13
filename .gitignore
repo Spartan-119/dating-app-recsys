@@ -3,3 +3,5 @@ __pycache__
 
 db.json
 db.py
+
+gnn_venv/
